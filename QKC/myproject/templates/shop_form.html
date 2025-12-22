@@ -15,69 +15,17 @@
     <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card shadow-sm p-4">
-          <form method="post">
-            {% csrf_token %}
+          <form
+            method="post"
+            action="{% if product %}
+                {% url 'myapp:edit_shop' product.id %}
+              {% else %}
+                {% url 'myapp:add_shop' %}
+              {% endif %}"
+          >
+            {% csrf_token %} {{ form.as_p }}
 
-            <!-- Tên -->
-            <div class="form-group">
-              <label>Tên sản phẩm</label>
-              <input
-                type="text"
-                name="name"
-                class="form-control"
-                value="{{ product.name|default:'' }}"
-                required
-              />
-            </div>
-
-            <!-- Ảnh -->
-            <div class="form-group">
-              <label>Link hình ảnh</label>
-              <input
-                type="text"
-                name="image"
-                class="form-control"
-                value="{{ product.image|default:'' }}"
-              />
-            </div>
-
-            <!-- Giá -->
-            <div class="form-group">
-              <label>Giá (VNĐ)</label>
-              <input
-                type="number"
-                name="price"
-                class="form-control"
-                value="{{ product.price|default:'' }}"
-                required
-              />
-            </div>
-
-            <!-- Mô tả -->
-            <div class="form-group">
-              <label>Mô tả sản phẩm</label>
-              <textarea
-                name="description"
-                rows="4"
-                class="form-control"
-              >
-{{ product.description|default:'' }}</textarea
-              >
-            </div>
-
-            <!-- Buttons -->
-            <div class="d-flex justify-content-between align-items-center mt-4">
-              <a
-                href="{% url 'myapp:shop' %}"
-                class="btn btn-outline-secondary"
-              >
-                ⬅ Quay lại shop
-              </a>
-
-              <button type="submit" class="btn btn-primary px-4">
-                Lưu sản phẩm
-              </button>
-            </div>
+            <button type="submit" class="btn btn-primary">💾 Lưu</button>
           </form>
         </div>
       </div>
