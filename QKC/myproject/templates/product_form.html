@@ -1,9 +1,0 @@
-<h2>Form Sản Phẩm</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Lưu</button>
-</form>
-
-<a href="{% url 'product_list' %}">Quay lại</a>

@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% load static %} {% block body_block %}
+<section class="ftco-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5">
+      <div class="col-md-7 text-center">
+        <h2 class="mb-4">
+          {% if product %} Sửa sản phẩm {% else %} Thêm sản phẩm mới {%endif %}
+        </h2>
+        <p class="text-muted">
+          Quản lý sản phẩm trái cây trong cửa hàng của bạn
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow-sm p-4">
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- Tên -->
+            <div class="form-group">
+              <label>Tên sản phẩm</label>
+              <input
+                type="text"
+                name="name"
+                class="form-control"
+                value="{{ product.name|default:'' }}"
+                required
+              />
+            </div>
+
+            <!-- Ảnh -->
+            <div class="form-group">
+              <label>Link hình ảnh</label>
+              <input
+                type="text"
+                name="image"
+                class="form-control"
+                value="{{ product.image|default:'' }}"
+              />
+            </div>
+
+            <!-- Giá -->
+            <div class="form-group">
+              <label>Giá (VNĐ)</label>
+              <input
+                type="number"
+                name="price"
+                class="form-control"
+                value="{{ product.price|default:'' }}"
+                required
+              />
+            </div>
+
+            <!-- Mô tả -->
+            <div class="form-group">
+              <label>Mô tả sản phẩm</label>
+              <textarea
+                name="description"
+                rows="4"
+                class="form-control"
+              >
+{{ product.description|default:'' }}</textarea
+              >
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <a
+                href="{% url 'myapp:shop' %}"
+                class="btn btn-outline-secondary"
+              >
+                ⬅ Quay lại shop
+              </a>
+
+              <button type="submit" class="btn btn-primary px-4">
+                Lưu sản phẩm
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
