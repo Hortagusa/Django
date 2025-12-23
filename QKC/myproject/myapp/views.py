@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from myapp.models import Product
+from myapp.models import Product, Order
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -80,6 +80,15 @@ def product_single(request, pk):
 
 
 def cart(request):
+    if request.method == 'POST':
+        firstName = request.POST.get('firstName','')
+        lastName = request.POST.get('lastName', '')
+        address = request.POST.get('address', '')
+        phone = request.POST.get('phone', '')
+        email = request.POST.get('email', '')
+
+        order = Order(firstName=firstName, lastName=lastName, address=address, phone=phone, email=email)
+        order.save()
     return render(request, 'cart.html')
 
 
