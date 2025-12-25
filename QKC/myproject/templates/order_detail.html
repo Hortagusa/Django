@@ -1,28 +1,166 @@
-{% extends 'base.html' %} {% load static %} {% block body_block %}
-<h2>Chi tiết đơn hàng #{{ order.id }}</h2>
+{% extends 'base.html' %}
+{% load static %}
+{% block body_block %}
 
-<p>Khách hàng: {{ order.firstName }} {{ order.lastName }}</p>
-<p>Trạng thái: <b>{{ order.get_status_display }}</b></p>
+<style>
+    .invoice-box {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        border: 1px solid #eee;
+        box-shadow: 0 0 15px rgba(0, 0, 0, .1);
+        font-size: 14px;
+        background: #fff;
+    }
 
-<table border="1">
-    <tr>
-        <th>Sản phẩm</th>
-        <th>Số lượng</th>
-        <th>Giá</th>
-    </tr>
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
 
-    {% for k, v in items.items %}
-    <tr>
-        <td>{{ v.1 }}</td>
-        <td>{{ v.0 }}</td>
-        <td>{{ v.2 }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    .invoice-header h2 {
+        margin: 0;
+    }
 
-<p><b>Tổng tiền:</b> {{ order.total }}</p>
+    .badge {
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        color: #fff;
+    }
 
-<a href="{% url 'myapp:invoice_pdf' order.id %}">
-    🧾 Xuất hóa đơn PDF
-</a>
+    .badge.pending {
+        background: #f0ad4e;
+    }
+
+    .badge.confirmed {
+        background: #0275d8;
+    }
+
+    .badge.shipping {
+        background: #5bc0de;
+    }
+
+    .badge.done {
+        background: #5cb85c;
+    }
+
+    .badge.cancel {
+        background: #d9534f;
+    }
+
+    .customer-info {
+        margin-bottom: 25px;
+    }
+
+    .customer-info p {
+        margin: 4px 0;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .invoice-table th {
+        background: #f8f9fa;
+    }
+
+    .product-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .total-box {
+        text-align: right;
+        margin-top: 20px;
+        font-size: 18px;
+    }
+
+    .total-box span {
+        font-weight: bold;
+        color: #d9534f;
+    }
+
+    .invoice-actions {
+        margin-top: 30px;
+        text-align: right;
+    }
+</style>
+
+<div class="invoice-box">
+
+    <!-- HEADER -->
+    <div class="invoice-header">
+        <div>
+            <h2>🧾 HÓA ĐƠN</h2>
+            <p>Mã đơn hàng: <b>#{{ order.id }}</b></p>
+        </div>
+
+        <span class="badge {{ order.status }}">
+            {{ order.get_status_display }}
+        </span>
+    </div>
+
+    <!-- CUSTOMER INFO -->
+    <div class="customer-info">
+        <p><b>Khách hàng:</b> {{ order.firstName }} {{ order.lastName }}</p>
+        <p><b>Email:</b> {{ order.email }}</p>
+        <p><b>Điện thoại:</b> {{ order.phone }}</p>
+        <p><b>Địa chỉ:</b> {{ order.address }}</p>
+        <p><b>Ngày đặt:</b> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <!-- PRODUCT TABLE -->
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Ảnh</th>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+                <th>Tạm tính</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k, v in items.items %}
+            <tr>
+                <td>
+                    <img src="{{ v.3 }}" class="product-img">
+                </td>
+                <td>{{ v.1 }}</td>
+                <td>{{ v.0 }}</td>
+                <td>{{ v.2 }} đ</td>
+                <td>{{ v.0|floatformat:0|add:""|floatformat }} × {{ v.2 }} đ</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- TOTAL -->
+    <div class="total-box">
+        Tổng thanh toán: <span>{{ order.total }} đ</span>
+    </div>
+
+    <!-- ACTION -->
+    <div class="invoice-actions">
+        <a href="{% url 'myapp:invoice_pdf' order.id %}" class="btn btn-primary">
+            🧾 Xuất hóa đơn PDF
+        </a>
+    </div>
+
+</div>
+
 {% endblock %}
