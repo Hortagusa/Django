@@ -1,0 +1,28 @@
+{% extends 'base.html' %} {% load static %} {% block body_block %}
+<h2>Chi tiết đơn hàng #{{ order.id }}</h2>
+
+<p>Khách hàng: {{ order.firstName }} {{ order.lastName }}</p>
+<p>Trạng thái: <b>{{ order.get_status_display }}</b></p>
+
+<table border="1">
+    <tr>
+        <th>Sản phẩm</th>
+        <th>Số lượng</th>
+        <th>Giá</th>
+    </tr>
+
+    {% for k, v in items.items %}
+    <tr>
+        <td>{{ v.1 }}</td>
+        <td>{{ v.0 }}</td>
+        <td>{{ v.2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><b>Tổng tiền:</b> {{ order.total }}</p>
+
+<a href="{% url 'myapp:invoice_pdf' order.id %}">
+    🧾 Xuất hóa đơn PDF
+</a>
+{% endblock %}

@@ -6,6 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import ProductForm
 from django.contrib.auth.models import User
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.http import  JsonResponse
+import json
+# Create your views here.
 
 def index(request):
     return render(request, 'index.html')
@@ -80,20 +85,77 @@ def product_single(request, pk):
 
 
 def cart(request):
-    if request.method == 'POST':
-        firstName = request.POST.get('firstName','')
-        lastName = request.POST.get('lastName', '')
-        address = request.POST.get('address', '')
-        phone = request.POST.get('phone', '')
-        email = request.POST.get('email', '')
+    if request.method == "POST":
+        cart_data = request.POST.get("cart")
+        if not cart_data:
+            return JsonResponse({"success": False})
 
-        order = Order(firstName=firstName, lastName=lastName, address=address, phone=phone, email=email)
-        order.save()
-    return render(request, 'cart.html')
+        cart = json.loads(cart_data)
+        total = sum(item[0] * item[2] for item in cart.values())
+
+        order = Order.objects.create(
+            firstName=request.POST.get("firstName"),
+            lastName=request.POST.get("lastName"),
+            address=request.POST.get("address"),
+            phone=request.POST.get("phone"),
+            email=request.POST.get("email"),
+            items=json.dumps(cart),
+            total=total
+        )
+
+        return JsonResponse({
+            "success": True,
+            "order_id": order.id
+        })
+
+    return render(request, "cart.html")
+
+def order_detail(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    items = json.loads(order.items)
+
+    return render(request, "order_detail.html", {
+        "order": order,
+        "items": items
+    })
+
+def export_invoice_pdf(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    items = json.loads(order.items)
+
+    template = get_template("invoice_pdf.html")
+    html = template.render({
+        "order": order,
+        "items": items
+    })
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="invoice_{order_id}.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response
 
 
 def checkout(request):
     return render(request, 'checkout.html')
+
+def export_invoice_pdf(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    products = Product.objects.all()
+
+    total = sum(p.price for p in products)
+
+    template = get_template("invoice_pdf.html")
+    html = template.render({
+        "order": order,
+        "products": products,
+        "total": total
+    })
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="invoice_{order_id}.pdf"'
+
+    pisa.CreatePDF(html, dest=response)
+    return response
 
 
 def wishlist(request):

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body_block %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: DejaVu Sans; }
+        h2 { text-align: center; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>HÓA ĐƠN BÁN HÀNG</h2>
+
+<p><b>Khách hàng:</b> {{ order.firstName }} {{ order.lastName }}</p>
+<p><b>Email:</b> {{ order.email }}</p>
+<p><b>SĐT:</b> {{ order.phone }}</p>
+<p><b>Địa chỉ:</b> {{ order.address }}</p>
+
+<table>
+    <tr>
+        <th>Tên sản phẩm</th>
+        <th>Giá</th>
+    </tr>
+
+    {% for p in products %}
+    <tr>
+        <td>{{ p.name }}</td>
+        <td>{{ p.price }} đ</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><b>Tổng tiền:</b> {{ total }} đ</p>
+
+</body>
+</html>
+
+{% endblock %}
